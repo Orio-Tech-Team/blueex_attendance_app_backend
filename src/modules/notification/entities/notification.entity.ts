@@ -1,15 +1,6 @@
 import { GenericEntity } from 'src/generic/generic.entity';
-import { Attendance } from 'src/modules/attendacne/entities/attendacne.entity';
-import {
-  Column,
-  Entity,
-  JoinColumn,
-  ManyToOne,
-  OneToMany,
-  PrimaryGeneratedColumn,
-} from 'typeorm';
-import { Station } from '../../station/entities/station.entity';
-import { Shift } from '../../shift/entities/shift.entity';
+import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
+
 import { Employee } from 'src/modules/employee/entities/employee.entity';
 
 export enum NotificationType {
@@ -19,9 +10,6 @@ export enum NotificationType {
 
 @Entity('notification')
 export class Notification extends GenericEntity {
-  @PrimaryGeneratedColumn()
-  notification_id: number;
-
   @Column({
     nullable: false,
   })
@@ -39,6 +27,10 @@ export class Notification extends GenericEntity {
   })
   employee_number: number;
 
-  @OneToMany(() => Employee, (employee) => employee.notification)
-  employee: Employee[];
+  @ManyToOne(() => Employee, (employee) => employee.notification)
+  @JoinColumn({
+    name: 'employee_number',
+    referencedColumnName: 'employee_number',
+  })
+  employee: Employee;
 }

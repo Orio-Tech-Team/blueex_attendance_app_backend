@@ -1,8 +1,8 @@
-import { Body, Controller, Get, Post, Req } from '@nestjs/common';
+import { Controller, Post, Req } from '@nestjs/common';
 import { ApiBearerAuth } from '@nestjs/swagger';
 import { EmployeeService } from '../employee/employee.service';
-import { NotificationType } from './entities/notification.entitiy';
-import { NotificationService } from './_notification.service';
+import { NotificationType } from './entities/notification.entity';
+import { NotificationService } from './notification.service';
 
 @Controller('notification')
 export class NotificationController {

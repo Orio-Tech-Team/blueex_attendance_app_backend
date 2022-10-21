@@ -4,7 +4,7 @@ import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
 import { Station } from '../../station/entities/station.entity';
 import { EmployeeStation } from './employee-station.entity';
 import { Shift } from '../../shift/entities/shift.entity';
-import { Notification } from 'src/modules/notification/entities/notification.entitiy';
+import { Notification } from 'src/modules/notification/entities/notification.entity';
 
 @Entity('employees')
 export class Employee extends GenericEntity {
@@ -32,7 +32,6 @@ export class Employee extends GenericEntity {
   @JoinColumn({ name: 'shift_id' })
   shift: Shift;
 
-  @ManyToOne(() => Notification, (notification) => notification.employee)
-  @JoinColumn({ name: 'notification_id' })
-  notification: Notification;
+  @OneToMany(() => Notification, (notification) => notification.employee)
+  notification: Notification[];
 }
