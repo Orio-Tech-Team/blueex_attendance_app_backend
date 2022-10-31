@@ -15,6 +15,7 @@ import { CitiesModule } from './modules/cities/cities.module';
 import { NotificationModule } from './modules/notification/notification.module';
 import { NotificationService } from './modules/notification/notification.service';
 import { NotificationController } from './notification/notification.controller';
+import { ShiftModule } from './modules/shift/shift.module';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { NotificationController } from './notification/notification.controller';
     AttendacneModule,
     CitiesModule,
     NotificationModule,
+    ShiftModule,
   ],
   controllers: [NotificationController],
   providers: [],
@@ -49,6 +51,7 @@ export class AppModule implements NestModule {
           method: RequestMethod.ALL,
         },
         { path: '/attendance-app/employee/all', method: RequestMethod.ALL },
+        { path: '/attendance-app/shift/all', method: RequestMethod.ALL },
       )
       .forRoutes({ path: '*', method: RequestMethod.ALL });
   }

@@ -5,10 +5,16 @@ import { Repository } from 'typeorm';
 
 @Injectable()
 export class ShiftService {
-    
-    constructor(
-        @InjectRepository(Shift)
-        private readonly shiftRepository : Repository<Shift>
-    ){}
+  constructor(
+    @InjectRepository(Shift)
+    private readonly shiftRepository: Repository<Shift>,
+  ) {}
 
+  async getAllShifts() {
+    return await this.shiftRepository.find({
+      where: {
+        is_deleted: false,
+      },
+    });
+  }
 }

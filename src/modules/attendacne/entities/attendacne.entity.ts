@@ -1,5 +1,6 @@
 import { GenericEntity } from 'src/generic/generic.entity';
 import { Employee } from 'src/modules/employee/entities/employee.entity';
+import { Shift } from 'src/modules/shift/entities/shift.entity';
 import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
 
 @Entity('attendance')

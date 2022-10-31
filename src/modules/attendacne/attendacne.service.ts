@@ -149,12 +149,7 @@ export class AttendacneService {
 
   async getAttendanceDataDto(getAttendanceDataDto: GetAttendanceDataDto) {
     let query =
-      "SELECT employees.* , IFNULL(attendance.intime,'00:00:00') as intime , IFNULL(attendance.outtime, '00:00:00') as outtime , DATE_FORMAT(employees.attendance_date, '%a') as day , (CASE WHEN attendance.type IS NULL AND DATE_FORMAT(employees.attendance_date,'%a') IN ('Sat','Sun') THEN 'Holiday' WHEN attendance.type IS NULL THEN 'Absent' ELSE attendance.type END) as type , TIMEDIFF(IFNULL(outtime,'00:00:00') , IFNULL(intime,'00:00:00')) as working_hours FROM attendance RIGHT JOIN (SELECT employees.employee_number ,employees.employee_name , v.selected_date as attendance_date FROM (SELECT ADDDATE('1970-01-01',t4.i*10000 + t3.i*1000 + t2.i*100 + t1.i*10 + t0.i) selected_date FROM (SELECT 0 i UNION SELECT 1 UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 UNION SELECT 5 UNION SELECT 6 UNION SELECT 7 UNION SELECT 8 UNION SELECT 9) t0,(SELECT 0 i UNION SELECT 1 UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 UNION SELECT 5 UNION SELECT 6 UNION SELECT 7 UNION SELECT 8 UNION SELECT 9) t1,(SELECT 0 i UNION SELECT 1 UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 UNION SELECT 5 UNION SELECT 6 UNION SELECT 7 UNION SELECT 8 UNION SELECT 9) t2,(SELECT 0 i UNION SELECT 1 UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 UNION SELECT 5 UNION SELECT 6 UNION SELECT 7 UNION SELECT 8 UNION SELECT 9) t3,(SELECT 0 i UNION SELECT 1 UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 UNION SELECT 5 UNION SELECT 6 UNION SELECT 7 UNION SELECT 8 UNION SELECT 9) t4) v , employees WHERE selected_date BETWEEN '" +
-      getAttendanceDataDto.from_date +
-      "' AND '" +
-      getAttendanceDataDto.to_date +
-      "') employees ON attendance.attendance_date = employees.attendance_date AND attendance.employee_number = employees.employee_number";
-
+      'SELECT att.*,ep.employee_name,ep.shift_id,s.start_time,s.end_time, (att.outtime-att.intime) as working_hours FROM attendance att left join employees ep on ep.employee_number=att.employee_number left join shifts s on s.id=ep.shift_id;';
     if (!getAttendanceDataDto.employee_number) {
       return await getManager().query(query);
     } else {
