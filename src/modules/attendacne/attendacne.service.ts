@@ -149,7 +149,7 @@ export class AttendacneService {
 
   async getAttendanceDataDto(getAttendanceDataDto: GetAttendanceDataDto) {
     let query =
-      'SELECT att.*,ep.employee_name,ep.shift_id,s.start_time,s.end_time, (att.outtime-att.intime) as working_hours FROM attendance att left join employees ep on ep.employee_number=att.employee_number left join shifts s on s.id=ep.shift_id;';
+      'SELECT att.*,ep.employee_name,ep.shift_id,s.start_time,s.end_time,CONCAT(s.start_time," - ",s.end_time) AS shift, (att.outtime-att.intime) as working_hours FROM attendance att left join employees ep on ep.employee_number=att.employee_number left join shifts s on s.id=ep.shift_id;';
     if (!getAttendanceDataDto.employee_number) {
       return await getManager().query(query);
     } else {
