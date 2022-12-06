@@ -14,7 +14,6 @@ import { AttendacneModule } from './modules/attendacne/attendacne.module';
 import { CitiesModule } from './modules/cities/cities.module';
 import { NotificationModule } from './modules/notification/notification.module';
 import { NotificationService } from './modules/notification/notification.service';
-import { NotificationController } from './notification/notification.controller';
 import { ShiftModule } from './modules/shift/shift.module';
 
 @Module({
@@ -30,7 +29,7 @@ import { ShiftModule } from './modules/shift/shift.module';
     NotificationModule,
     ShiftModule,
   ],
-  controllers: [NotificationController],
+  controllers: [],
   providers: [],
 })
 export class AppModule implements NestModule {
