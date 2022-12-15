@@ -1,18 +1,27 @@
 import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
+import { InjectConnection, InjectRepository } from '@nestjs/typeorm';
 import { Attendance } from './entities/attendacne.entity';
-import { Repository, MoreThanOrEqual, LessThanOrEqual } from 'typeorm';
+import {
+  Repository,
+  MoreThanOrEqual,
+  LessThanOrEqual,
+  Connection,
+} from 'typeorm';
 import { GetDate } from 'src/Helper/common/date.common';
-import { GetAttendanceDto } from './dto/get-attendance.dto';
+import {
+  GetAttendanceDto,
+  GetPerEmployeeAttendanceDto,
+} from './dto/get-attendance.dto';
 import { GetAttendanceServerDto } from './dto/get-attendance-server.dto';
 import { GetAttendanceDataDto } from './dto/get-attendance-data.dto';
-import { getConnection } from 'typeorm';
 import { Employee } from 'src/modules/employee/entities/employee.entity';
 import { getManager } from 'typeorm';
 
 @Injectable()
 export class AttendacneService {
   constructor(
+    @InjectConnection()
+    private readonly connection: Connection,
     @InjectRepository(Attendance)
     private readonly attendanceRepository: Repository<Attendance>,
   ) {}
@@ -161,5 +170,13 @@ export class AttendacneService {
         "'";
       return await getManager().query(query);
     }
+  }
+
+  async findByMonth(
+    getPerEmployeeAttendanceDto: GetPerEmployeeAttendanceDto,
+  ): Promise<any> {
+    return await this.connection.query(
+      `SELECT employee_number,attendance_date,type,is_deleted,status,intime,outtime FROM attendance WHERE employee_number = "${getPerEmployeeAttendanceDto.employee_number}" AND monthname(attendance_date) = "${getPerEmployeeAttendanceDto.attendance_month}" AND YEAR(attendance_date) = "${getPerEmployeeAttendanceDto.attendance_year}";`,
+    );
   }
 }
