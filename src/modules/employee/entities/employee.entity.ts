@@ -5,6 +5,8 @@ import { Station } from '../../station/entities/station.entity';
 import { EmployeeStation } from './employee-station.entity';
 import { Shift } from '../../shift/entities/shift.entity';
 import { Notification } from 'src/modules/notification/entities/notification.entity';
+import { EmployeeDepartment } from './employee-department.entity';
+import { EmployeeDesignation } from './employee-designation.entity';
 
 @Entity('employees')
 export class Employee extends GenericEntity {
@@ -27,6 +29,18 @@ export class Employee extends GenericEntity {
     (employee_station) => employee_station.employee,
   )
   employee_station: EmployeeStation[];
+
+  @OneToMany(
+    () => EmployeeDepartment,
+    (employee_department) => employee_department.employee,
+  )
+  employee_department: EmployeeDepartment[];
+
+  @OneToMany(
+    () => EmployeeDesignation,
+    (employee_designation) => employee_designation.employee,
+  )
+  employee_designation: EmployeeDesignation[];
 
   @ManyToOne(() => Shift, (shift) => shift.employee)
   @JoinColumn({ name: 'shift_id' })

@@ -15,6 +15,9 @@ import { CitiesModule } from './modules/cities/cities.module';
 import { NotificationModule } from './modules/notification/notification.module';
 import { NotificationService } from './modules/notification/notification.service';
 import { ShiftModule } from './modules/shift/shift.module';
+import { DepartmentsModule } from './departments/departments.module';
+import { DepartmentsModule } from './modules/departments/departments.module';
+import { DesignationModule } from './modules/designation/designation.module';
 
 @Module({
   imports: [
@@ -28,6 +31,8 @@ import { ShiftModule } from './modules/shift/shift.module';
     CitiesModule,
     NotificationModule,
     ShiftModule,
+    DepartmentsModule,
+    DesignationModule,
   ],
   controllers: [],
   providers: [],
