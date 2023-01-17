@@ -9,6 +9,9 @@ import {
 } from './dto/get-attendance.dto';
 import { GetAttendanceDataDto } from './dto/get-attendance-data.dto';
 import { Response } from 'src/Helper/common/response.common';
+const axios = require('axios');
+const moment = require('moment');
+const nodemailer = require('nodemailer');
 //
 @Controller('attendance')
 export class AttendacneController {
@@ -22,7 +25,25 @@ export class AttendacneController {
   async markAttendance(@Req() request): Promise<any> {
     const employeeNumber = request.user_information.refrence_number;
     const employee = await this.employeeService.findByShift(employeeNumber);
-    return await this.attendacneService.markAttendance(employee);
+    const attendance = await this.attendacneService.markAttendance(employee);
+    //
+    const method = {
+      method: 'post',
+      url: 'http://benefitx.blue-ex.com/hrm/cronjob/appattendance.php',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      data: JSON.stringify({
+        data: `{"empid":${employeeNumber},"time":${moment().format(
+          'HHmm',
+        )}, "status":"${attendance.type
+          .charAt(0)
+          .toUpperCase()}", "channel":"APP"}`,
+      }),
+    };
+    await axios(method);
+
+    return attendance;
   }
   //
   @ApiBearerAuth('JWT-auth')
@@ -81,5 +102,47 @@ export class AttendacneController {
     return await this.attendacneService.getAttendanceDataDto(
       getAttendanceDataDto,
     );
+  }
+
+  @Post('hr-attendance-update')
+  async hrAttedanceUpdate(
+    @Body() hrAttendance: { date: string; time: string; type: string },
+    @Req() request,
+  ) {
+    const employeeNumber = request.user_information.refrence_number;
+    const employee = await this.employeeService.findByEmployee(employeeNumber);
+    //
+    let testAccount = await nodemailer.createTestAccount();
+    //
+    let transporter = nodemailer.createTransport({
+      host: 'orio.tech',
+      port: 465,
+      secure: true, // true for 465, false for other ports
+      auth: {
+        user: `ateeb.khan@orio.tech`, // generated ethereal user
+        pass: `jcUIKc-9V}Z5`, // generated ethereal password
+      },
+    });
+    //
+    let info = await transporter.sendMail({
+      from: '"Ateeb" <ateeb.khan@orio.tech>', // sender address
+      to: 'mohammad.ismail@orio.tech', // list of receivers
+      subject: 'Request for attendance!', // Subject line
+      text: 'Hello world?', // plain text body
+      html: `<b>Me employee holding Employee ID: ${employeeNumber}</b>
+      <b>Employee Name: ${employee[0].employee_name}</b>
+      <p>Kindly update my attendance on date ${hrAttendance.date}
+      update my ${hrAttendance.type} time, time ${hrAttendance.time}
+      </p>
+      `, // html body
+    });
+    //
+    console.log('Message sent: %s', info.messageId);
+    // Message sent: <b658f8ca-6296-ccf4-8306-87d57a0b4321@example.com>
+
+    // Preview only available when sending through an Ethereal account
+    console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info));
+    //
+    return '';
   }
 }
