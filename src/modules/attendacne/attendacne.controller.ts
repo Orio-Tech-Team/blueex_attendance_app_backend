@@ -106,7 +106,8 @@ export class AttendacneController {
 
   @Post('hr-attendance-update')
   async hrAttedanceUpdate(
-    @Body() hrAttendance: { date: string; time: string; type: string },
+    @Body()
+    hrAttendance: { date: string; time: string; type: string; comment: string },
     @Req() request,
   ) {
     const employeeNumber = request.user_information.refrence_number;
@@ -119,21 +120,23 @@ export class AttendacneController {
       port: 465,
       secure: true, // true for 465, false for other ports
       auth: {
-        user: `ateeb.khan@orio.tech`, // generated ethereal user
-        pass: `jcUIKc-9V}Z5`, // generated ethereal password
+        user: `attendance@orio.tech`, // generated ethereal user
+        pass: `kkcdY?umlCP`, // generated ethereal password
       },
     });
     //
     let info = await transporter.sendMail({
-      from: '"Ateeb" <ateeb.khan@orio.tech>', // sender address
-      to: 'mohammad.ismail@orio.tech', // list of receivers
-      subject: 'Request for attendance!', // Subject line
-      text: 'Hello world?', // plain text body
+      from: '"ORIO - Technologies" <attendance@orio.tech>', // sender address
+      to: 'ateebkhan997@gmail.com', // list of receivers
+      // to: '', // list of receivers
+      subject: 'Attendance Request!', // Subject line
+      // text: 'Hello world?', // plain text body
       html: `<b>Me employee holding Employee ID: ${employeeNumber}</b>
       <b>Employee Name: ${employee[0].employee_name}</b>
       <p>Kindly update my attendance on date ${hrAttendance.date}
       update my ${hrAttendance.type} time, time ${hrAttendance.time}
       </p>
+      <p>${hrAttendance.comment}</p>
       `, // html body
     });
     //
