@@ -67,11 +67,17 @@ export class AttendacneService {
     const attendance = await this.getAttendance(employee.employee_number, date);
 
     let attendanceType = 'Present';
-    if (employee.shift.start_time.toString() < inTime) {
+    let shiftTime = employee.shift.start_time.toString();
+    let shiftList = shiftTime.split(':');
+    shiftList[1] = (+shiftList[1] + 10).toString();
+    //
+    let graceTime = `${shiftList[0]}:${shiftList[1]}:${shiftList[2]}`;
+    if (graceTime < inTime) {
       attendanceType = 'Late';
     } else {
       attendanceType = 'Present';
     }
+
     let newAttendance;
     if (attendance == true) {
       newAttendance = await this.attendanceRepository.save(
