@@ -112,6 +112,7 @@ export class AttendacneController {
   ) {
     const employeeNumber = request.user_information.refrence_number;
     const employee = await this.employeeService.findByEmployee(employeeNumber);
+
     //
     let testAccount = await nodemailer.createTestAccount();
     //
@@ -127,17 +128,20 @@ export class AttendacneController {
     //
     let info = await transporter.sendMail({
       from: '"ORIO - Technologies" <attendance@orio.tech>', // sender address
-      to: 'ateebkhan997@gmail.com', // list of receivers
+      to: 'anam.saleem@blue-ex.com,hr.south@blue-ex.com,ateeb.khan@orio.tech', // list of receivers
       // to: '', // list of receivers
       subject: 'Attendance Request!', // Subject line
       // text: 'Hello world?', // plain text body
-      html: `<b>Me employee holding Employee ID: ${employeeNumber}</b>
-      <b>Employee Name: ${employee[0].employee_name}</b>
-      <p>Kindly update my attendance on date ${hrAttendance.date}
-      update my ${hrAttendance.type} time, time ${hrAttendance.time}
+      html: `
+      <p>
+      Hi,</br>
+      Me ${employee[0].employee_name} with Employee ID: ${employeeNumber}, request you to kindly update my attendance for - Date ${hrAttendance.date}, ${hrAttendance.time}, ${hrAttendance.type}.
+      </br>
+      Reason
+      </br>
+      ${hrAttendance.comment}
       </p>
-      <p>${hrAttendance.comment}</p>
-      `, // html body
+      `,
     });
     //
     console.log('Message sent: %s', info.messageId);
