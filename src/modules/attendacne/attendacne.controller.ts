@@ -29,19 +29,22 @@ export class AttendacneController {
     const employee = await this.employeeService.findByShift(employeeNumber);
     const attendance = await this.attendacneService.markAttendance(employee);
     //
+    console.log( JSON.stringify(`{"empid":${employeeNumber},"time":${moment().format(
+      'HHmm',
+    )}, "status":"${attendance.type
+      .charAt(0)
+      .toUpperCase()}", "channel":"APP"}`));
     const method = {
       method: 'post',
       url: 'http://benefitx.blue-ex.com/hrm/cronjob/appattendance.php',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
       },
-      data: JSON.stringify({
-        data: `{"empid":${employeeNumber},"time":${moment().format(
+      data: JSON.stringify(`{"empid":${employeeNumber},"time":${moment().format(
           'HHmm',
         )}, "status":"${attendance.type
           .charAt(0)
-          .toUpperCase()}", "channel":"APP"}`,
-      }),
+          .toUpperCase()}", "channel":"APP"}`),
     };
     await axios(method);
 
