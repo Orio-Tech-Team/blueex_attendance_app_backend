@@ -12,7 +12,7 @@ import { Response } from 'src/Helper/common/response.common';
 import { time } from 'console';
 import { Employee } from '../employee/entities/employee.entity';
 const axios = require('axios');
-import moment from 'moment';
+const moment = require('moment');
 const nodemailer = require('nodemailer');
 //
 @Controller('attendance')
