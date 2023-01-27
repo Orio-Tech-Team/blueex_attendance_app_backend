@@ -12,7 +12,7 @@ import { Response } from 'src/Helper/common/response.common';
 const axios = require('axios');
 const moment = require('moment');
 const nodemailer = require('nodemailer');
-const qs = require('qs');
+const FormData = require('form-data');
 //
 @Controller('attendance')
 export class AttendacneController {
@@ -28,19 +28,24 @@ export class AttendacneController {
     const employee = await this.employeeService.findByShift(employeeNumber);
     const attendance = await this.attendacneService.markAttendance(employee);
     //
-    const data = JSON.stringify({
-      empid: employeeNumber,
-      time: moment().format('HHmm'),
-      status: attendance.type.charAt(0).toUpperCase(),
-      channel: 'APP',
-    });
+    const data = new FormData();
+
+    data.append(
+      'data',
+      JSON.stringify({
+        empid: employeeNumber,
+        time: moment().format('HHmm'),
+        status: attendance.type.charAt(0).toUpperCase(),
+        channel: 'APP',
+      }),
+    );
 
     //
     const method = {
       method: 'post',
       url: 'http://benefitx.blue-ex.com/hrm/cronjob/appattendance.php',
       headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
+        ...data.getHeaders(),
       },
       data: data,
     };
@@ -130,23 +135,26 @@ export class AttendacneController {
     time_to_check = newTime.join('');
     var attendance_type: string =
       employee.shift.start_time.toString() < time_to_check ? 'L' : 'P';
-
-    const data_to_send = {
-      empid: employeeNumber,
-      date: hrAttendance.date,
-      time: hrAttendance.time,
-      status: attendance_type,
-      comment: hrAttendance.comment,
-      attype: attendance_status,
-    };
+    const data = new FormData();
+    data.append(
+      'data',
+      JSON.stringify({
+        empid: employeeNumber,
+        date: hrAttendance.date,
+        time: hrAttendance.time,
+        status: attendance_type,
+        comment: hrAttendance.comment,
+        attype: attendance_status,
+      }),
+    );
 
     var config = {
       method: 'post',
       url: 'http://benefitx.blue-ex.com/hrm/cronjob/appattendance.php',
       headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
+        ...data.getHeaders(),
       },
-      data: JSON.stringify(data_to_send),
+      data: data,
     };
     const respones = await axios(config);
 
