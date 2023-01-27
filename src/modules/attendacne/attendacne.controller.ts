@@ -28,14 +28,13 @@ export class AttendacneController {
     const employee = await this.employeeService.findByShift(employeeNumber);
     const attendance = await this.attendacneService.markAttendance(employee);
     //
-    const data = qs.stringify({
-      data: {
-        empid: employeeNumber,
-        time: moment().format('HHmm'),
-        status: attendance.type.charAt(0).toUpperCase(),
-        channel: 'APP',
-      },
+    const data = JSON.stringify({
+      empid: employeeNumber,
+      time: moment().format('HHmm'),
+      status: attendance.type.charAt(0).toUpperCase(),
+      channel: 'APP',
     });
+
     //
     const method = {
       method: 'post',
@@ -133,14 +132,12 @@ export class AttendacneController {
       employee.shift.start_time.toString() < time_to_check ? 'L' : 'P';
 
     const data_to_send = {
-      data: {
-        empid: employeeNumber,
-        date: hrAttendance.date,
-        time: hrAttendance.time,
-        status: attendance_type,
-        comment: hrAttendance.comment,
-        attype: attendance_status,
-      },
+      empid: employeeNumber,
+      date: hrAttendance.date,
+      time: hrAttendance.time,
+      status: attendance_type,
+      comment: hrAttendance.comment,
+      attype: attendance_status,
     };
 
     var config = {
@@ -149,7 +146,7 @@ export class AttendacneController {
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
       },
-      data: qs.stringify(data_to_send),
+      data: JSON.stringify(data_to_send),
     };
     const respones = await axios(config);
 
