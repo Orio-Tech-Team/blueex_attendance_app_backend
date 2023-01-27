@@ -150,7 +150,7 @@ export class AttendacneController {
 
     var config = {
       method: 'post',
-      url: 'http://benefitx.blue-ex.com/hrm/cronjob/appattendance.php',
+      url: 'http://benefitx.blue-ex.com/hrm/cronjob/appattendance_update.php',
       headers: {
         ...data.getHeaders(),
       },
