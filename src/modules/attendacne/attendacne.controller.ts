@@ -12,8 +12,9 @@ import { Response } from 'src/Helper/common/response.common';
 import { time } from 'console';
 import { Employee } from '../employee/entities/employee.entity';
 const axios = require('axios');
-import moment from 'moment';
+const moment = require('moment');
 const nodemailer = require('nodemailer');
+const qs = require('qs');
 //
 @Controller('attendance')
 export class AttendacneController {
@@ -29,21 +30,28 @@ export class AttendacneController {
     const employee = await this.employeeService.findByShift(employeeNumber);
     const attendance = await this.attendacneService.markAttendance(employee);
     //
+    const data = qs.stringify({
+      data: {
+        empid: employeeNumber,
+        time: moment().format('HHmm'),
+        status: attendance.type.charAt(0).toUpperCase(),
+        channel: 'APP',
+      },
+    });
+
+    console.log(data);
+    //
     const method = {
       method: 'post',
       url: 'http://benefitx.blue-ex.com/hrm/cronjob/appattendance.php',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
       },
-      data: JSON.stringify({
-        data: `{"empid":${employeeNumber},"time":${moment().format(
-          'HHmm',
-        )}, "status":"${attendance.type
-          .charAt(0)
-          .toUpperCase()}", "channel":"APP"}`,
-      }),
+      data: data,
     };
-    await axios(method);
+
+    const response = await axios(method);
+    console.log(response.data);
 
     return attendance;
   }
@@ -113,9 +121,9 @@ export class AttendacneController {
     @Req() request,
   ) {
     const employeeNumber = request.user_information.refrence_number;
-    const employee: Employee[] = await this.employeeService.findByEmployee(
-      employeeNumber,
-    );
+    const employee = await this.employeeService.findByShift(employeeNumber);
+    console.log(employee.shift);
+
     //
     var attendance_status: string = hrAttendance.type
       .toLowerCase()
@@ -128,8 +136,8 @@ export class AttendacneController {
     newTime.splice(2, 0, ':');
     time_to_check = newTime.join('');
     var attendance_type: string =
-      employee[0].shift.start_time.toString() < time_to_check ? 'L' : 'P';
-    //
+      employee.shift.start_time.toString() < time_to_check ? 'L' : 'P';
+
     const data_to_send = {
       data: {
         empid: employeeNumber,
@@ -140,49 +148,47 @@ export class AttendacneController {
         attype: attendance_status,
       },
     };
-    //
+
     var config = {
       method: 'post',
       url: 'http://benefitx.blue-ex.com/hrm/cronjob/appattendance.php',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
       },
-      data: JSON.stringify(data_to_send),
+      data: qs.stringify(data_to_send),
     };
-    const respones = await axios.post(config);
-    console.log(respones);
+    const respones = await axios(config);
 
+    let testAccount = await nodemailer.createTestAccount();
+
+    let transporter = nodemailer.createTransport({
+      host: 'orio.tech',
+      port: 465,
+      secure: true, // true for 465, false for other ports
+      auth: {
+        user: `attendance@orio.tech`, // generated ethereal user
+        pass: `kkcdY?umlCP`, // generated ethereal password
+      },
+    });
     //
-    // let testAccount = await nodemailer.createTestAccount();
-    //
-    // let transporter = nodemailer.createTransport({
-    //   host: 'orio.tech',
-    //   port: 465,
-    //   secure: true, // true for 465, false for other ports
-    //   auth: {
-    //     user: `attendance@orio.tech`, // generated ethereal user
-    //     pass: `kkcdY?umlCP`, // generated ethereal password
-    //   },
-    // });
-    // //
-    // let info = await transporter.sendMail({
-    //   from: '"ORIO - Technologies" <attendance@orio.tech>', // sender address
-    //   to: 'anam.saleem@blue-ex.com,hr.south@blue-ex.com,ateeb.khan@orio.tech', // list of receivers
-    //   // to: '', // list of receivers
-    //   subject: 'Attendance Request!', // Subject line
-    //   // text: 'Hello world?', // plain text body
-    //   html: `
-    //   <p>
-    //   Hi,</br>
-    //   Me ${employee[0].employee_name} with Employee ID: ${employeeNumber}, request you to kindly update my attendance for - Date ${hrAttendance.date}, ${hrAttendance.time}, ${hrAttendance.type}.
-    //   </br>
-    //   Reason
-    //   </br>
-    //   ${hrAttendance.comment}
-    //   </p>
-    //   `,
-    // });
-    //
+    let info = await transporter.sendMail({
+      from: '"ORIO - Technologies" <attendance@orio.tech>', // sender address
+      to: 'anam.saleem@blue-ex.com,hr.south@blue-ex.com', // list of receivers
+      // to: '', // list of receivers
+      subject: 'Attendance Request!', // Subject line
+      // text: 'Hello world?', // plain text body
+      html: `
+      <p>
+      Hi,</br>
+      Me ${employee.employee_name} with Employee ID: ${employeeNumber}, request you to kindly update my attendance for - Date ${hrAttendance.date}, ${hrAttendance.time}, ${hrAttendance.type}.
+      </br>
+      Reason
+      </br>
+      ${hrAttendance.comment}
+      </p>
+      `,
+    });
+
     return {
       message: 'request success!',
     };
