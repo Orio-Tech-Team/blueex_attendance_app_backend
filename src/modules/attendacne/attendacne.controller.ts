@@ -9,8 +9,6 @@ import {
 } from './dto/get-attendance.dto';
 import { GetAttendanceDataDto } from './dto/get-attendance-data.dto';
 import { Response } from 'src/Helper/common/response.common';
-import { time } from 'console';
-import { Employee } from '../employee/entities/employee.entity';
 const axios = require('axios');
 const moment = require('moment');
 const nodemailer = require('nodemailer');
@@ -38,8 +36,6 @@ export class AttendacneController {
         channel: 'APP',
       },
     });
-
-    console.log(data);
     //
     const method = {
       method: 'post',
@@ -51,8 +47,7 @@ export class AttendacneController {
     };
 
     const response = await axios(method);
-    console.log(response.data);
-
+    //
     return attendance;
   }
   //
@@ -122,7 +117,6 @@ export class AttendacneController {
   ) {
     const employeeNumber = request.user_information.refrence_number;
     const employee = await this.employeeService.findByShift(employeeNumber);
-    console.log(employee.shift);
 
     //
     var attendance_status: string = hrAttendance.type
