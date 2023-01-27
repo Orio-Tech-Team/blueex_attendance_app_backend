@@ -121,7 +121,7 @@ export class AttendacneController {
   ) {
     const employeeNumber = request.user_information.refrence_number;
     const employee = await this.employeeService.findByShift(employeeNumber);
-
+    var time_to_send = hrAttendance.time.replace(':', '');
     //
     var attendance_status: string = hrAttendance.type
       .toLowerCase()
@@ -141,7 +141,7 @@ export class AttendacneController {
       JSON.stringify({
         empid: employeeNumber,
         date: hrAttendance.date,
-        time: hrAttendance.time,
+        time: time_to_send,
         status: attendance_type,
         comment: hrAttendance.comment,
         attype: attendance_status,
