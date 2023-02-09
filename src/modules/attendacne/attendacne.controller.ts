@@ -67,6 +67,20 @@ export class AttendacneController {
     return Response.get(200, 'success', employee);
   }
   //
+  @ApiBearerAuth('JWT-auth')
+  @Get('get_employee_attendance')
+  async getEmployeeAttendance(@Req() request): Promise<any> {
+    const employeeNumber = request.user_information.refrence_number;
+    const currentDate = moment();
+
+    const employee = await this.attendacneService.getAttendance(
+      employeeNumber,
+      currentDate.format('YYYY-MM-DD'),
+    );
+
+    return Response.get(200, 'success', employee);
+  }
+  //
 
   @Post('manual')
   async markAttendanceManually(@Req() request): Promise<any> {
