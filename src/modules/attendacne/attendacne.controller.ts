@@ -136,6 +136,11 @@ export class AttendacneController {
     var attendance_type: string =
       employee.shift.start_time.toString() < time_to_check ? 'L' : 'P';
     const data = new FormData();
+    if (time_to_send.length == 3) {
+      time_to_send = `0${time_to_send}`;
+    }
+    console.log(time_to_send);
+
     data.append(
       'data',
       JSON.stringify({
