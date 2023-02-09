@@ -191,8 +191,8 @@ export class AttendacneController {
     //
     let info = await transporter.sendMail({
       from: '"ORIO - Technologies" <attendance@orio.tech>', // sender address
-      to: 'anam.saleem@blue-ex.com,hr.south@blue-ex.com', // list of receivers
-      // to: '', // list of receivers
+      // to: 'anam.saleem@blue-ex.com,hr.south@blue-ex.com', // list of receivers
+      to: 'ateebkhan997@gmail.com', // list of receivers/
       subject: 'Attendance Request!', // Subject line
       // text: 'Hello world?', // plain text body
       html: `
