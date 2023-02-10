@@ -29,6 +29,7 @@ export class AttendacneController {
 
     const attendance = await this.attendacneService.markAttendance(employee);
     //
+
     const data = new FormData();
 
     data.append(
