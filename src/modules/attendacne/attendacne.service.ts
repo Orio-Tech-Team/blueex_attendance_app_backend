@@ -112,7 +112,7 @@ export class AttendacneService {
         },
       })
       .catch((error) => {
-        return true;
+        return [];
       });
   }
 

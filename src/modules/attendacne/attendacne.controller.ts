@@ -77,6 +77,7 @@ export class AttendacneController {
       employeeNumber,
       currentDate.format('YYYY-MM-DD'),
     );
+    console.log(employee);
 
     return Response.get(200, 'success', employee);
   }
