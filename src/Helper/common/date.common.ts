@@ -1,3 +1,4 @@
+import * as moment from 'moment-timezone';
 export class GetDate {
   static currentDate() {
     const today = new Date();
@@ -7,15 +8,7 @@ export class GetDate {
   }
 
   static currentTime() {
-    const today = new Date();
-    return (
-      (today.getHours() < 10 ? '0' : '') +
-      today.getHours() +
-      ':' +
-      (today.getMinutes() < 10 ? '0' : '') +
-      today.getMinutes() +
-      ':' +
-      today.getSeconds()
-    );
+    const time = moment.tz(Date.now(), 'Asia/Karachi');
+    return time.format('HH:mm:ss');
   }
 }

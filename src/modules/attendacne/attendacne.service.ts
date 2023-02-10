@@ -33,6 +33,7 @@ export class AttendacneService {
       attendanceDate,
     );
     const attendanceTime = GetDate.currentTime().toString();
+
     let attendanceType = 'Present';
     if (employee.shift.start_time.toString() < attendanceTime) {
       attendanceType = 'Late';
