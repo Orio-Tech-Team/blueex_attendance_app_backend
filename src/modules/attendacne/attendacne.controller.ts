@@ -159,14 +159,6 @@ export class AttendacneController {
     if (time_to_send.length == 3) {
       time_to_send = `0${time_to_send}`;
     }
-    console.log({
-      empid: employeeNumber,
-      date: hrAttendance.date,
-      time: time_to_send,
-      status: attendance_type,
-      comment: hrAttendance.comment,
-      attype: attendance_status,
-    });
 
     data.append(
       'data',
