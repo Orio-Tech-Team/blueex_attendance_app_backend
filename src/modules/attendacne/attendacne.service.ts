@@ -185,4 +185,14 @@ export class AttendacneService {
       `SELECT employee_number,attendance_date,type,is_deleted,status,intime,outtime FROM attendance WHERE employee_number = "${getPerEmployeeAttendanceDto.employee_number}" AND monthname(attendance_date) = "${getPerEmployeeAttendanceDto.attendance_month}" AND YEAR(attendance_date) = "${getPerEmployeeAttendanceDto.attendance_year}";`,
     );
   }
+  //
+  timeHandler = (time: string) => {
+    var hours = time.substring(0, time.indexOf(':'));
+    var mins = time.substring(time.indexOf(':') + 1);
+    //
+    if (mins.length == 1) mins = '0' + mins;
+    if (hours.length == 1) hours = '0' + hours;
+    //
+    return hours + ':' + mins;
+  };
 }

@@ -135,7 +135,9 @@ export class AttendacneController {
   ) {
     const employeeNumber = request.user_information.refrence_number;
     const employee = await this.employeeService.findByShift(employeeNumber);
-    var time_to_send = hrAttendance.time.replace(':', '');
+    var time_to_send = this.attendacneService
+      .timeHandler(hrAttendance.time)
+      .replace(':', '');
 
     //
     var attendance_status: string = hrAttendance.type
@@ -149,11 +151,22 @@ export class AttendacneController {
     newTime.splice(2, 0, ':');
     time_to_check = newTime.join('');
     var attendance_type: string =
-      employee.shift.start_time.toString() < hrAttendance.time ? 'L' : 'P';
+      employee.shift.start_time.toString() <
+      this.attendacneService.timeHandler(hrAttendance.time)
+        ? 'L'
+        : 'P';
     const data = new FormData();
     if (time_to_send.length == 3) {
       time_to_send = `0${time_to_send}`;
     }
+    console.log({
+      empid: employeeNumber,
+      date: hrAttendance.date,
+      time: time_to_send,
+      status: attendance_type,
+      comment: hrAttendance.comment,
+      attype: attendance_status,
+    });
 
     data.append(
       'data',
