@@ -79,7 +79,7 @@ export class AttendacneController {
       currentDate.format('YYYY-MM-DD'),
     );
     //
-    if (employee) return Response.get(200, 'success', []);
+    // if (employee) return Response.get(200, 'success', []);
     //
     return Response.get(200, 'success', employee);
   }
