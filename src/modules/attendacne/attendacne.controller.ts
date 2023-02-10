@@ -26,6 +26,7 @@ export class AttendacneController {
   async markAttendance(@Req() request): Promise<any> {
     const employeeNumber = request.user_information.refrence_number;
     const employee = await this.employeeService.findByShift(employeeNumber);
+
     const attendance = await this.attendacneService.markAttendance(employee);
     //
     const data = new FormData();
@@ -78,6 +79,7 @@ export class AttendacneController {
       currentDate.format('YYYY-MM-DD'),
     );
     //
+    if (employee) return Response.get(200, 'success', []);
     //
     return Response.get(200, 'success', employee);
   }
