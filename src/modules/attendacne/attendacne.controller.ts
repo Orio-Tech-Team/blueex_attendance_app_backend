@@ -88,10 +88,11 @@ export class AttendacneController {
     const in_time = moment(employee.intime, 'hh:mm:ss').toDate();
     const out_time = moment(employee.outtime, 'hh:mm:ss').toDate();
     //
-    const working_hours = this.attendacneService.timeDifference(
-      in_time,
-      out_time,
-    );
+
+    //
+    const working_hours = employee.outtime
+      ? this.attendacneService.timeDifference(in_time, out_time)
+      : null;
     //
     employee = {
       ...employee,
