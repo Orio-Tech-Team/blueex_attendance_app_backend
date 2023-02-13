@@ -10,7 +10,10 @@ import {
 import { GetAttendanceDataDto } from './dto/get-attendance-data.dto';
 import { Response } from 'src/Helper/common/response.common';
 const axios = require('axios');
-const moment = require('moment');
+//
+import * as moment from 'moment';
+//
+// const moment = require('moment');
 const nodemailer = require('nodemailer');
 const FormData = require('form-data');
 //
@@ -75,12 +78,25 @@ export class AttendacneController {
     const employeeNumber = request.user_information.refrence_number;
     const currentDate = moment();
 
-    const employee = await this.attendacneService.getAttendance(
+    var employee = await this.attendacneService.getAttendance(
       employeeNumber,
       currentDate.format('YYYY-MM-DD'),
     );
     //
     if (typeof employee == 'boolean') return Response.get(200, 'success', {});
+    //
+    const in_time = moment(employee.intime, 'hh:mm:ss').toDate();
+    const out_time = moment(employee.outtime, 'hh:mm:ss').toDate();
+    //
+    const working_hours = this.attendacneService.timeDifference(
+      in_time,
+      out_time,
+    );
+    //
+    employee = {
+      ...employee,
+      working_hours,
+    };
     //
     return Response.get(200, 'success', employee);
   }
@@ -221,3 +237,4 @@ export class AttendacneController {
     };
   }
 }
+//
