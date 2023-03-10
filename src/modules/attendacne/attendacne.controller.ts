@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, Req } from '@nestjs/common';
+import { Body, Controller, Get, Post, Req, Res } from '@nestjs/common';
 import { ApiBearerAuth } from '@nestjs/swagger';
 import { EmployeeService } from '../employee/employee.service';
 import { AttendacneService } from './attendacne.service';
@@ -23,6 +23,46 @@ export class AttendacneController {
     private readonly attendacneService: AttendacneService,
     private readonly employeeService: EmployeeService,
   ) {}
+
+  @ApiBearerAuth('JWT-auth')
+  @Get('app')
+  async markAttendanceApp(@Req() request): Promise<any> {
+    try {
+      const employeeNumber = request.user_information.refrence_number;
+      const employee = await this.employeeService.findByShift(employeeNumber);
+
+      const attendance = await this.attendacneService.markAttendance(employee);
+      //
+
+      const data = new FormData();
+
+      data.append(
+        'data',
+        JSON.stringify({
+          empid: employeeNumber,
+          time: moment().format('HHmm'),
+          status: attendance.type.charAt(0).toUpperCase(),
+          channel: 'APP',
+        }),
+      );
+
+      //
+      const method = {
+        method: 'post',
+        url: 'http://benefitx.blue-ex.com/hrm/cronjob/appattendance.php',
+        headers: {
+          ...data.getHeaders(),
+        },
+        data: data,
+      };
+
+      const response = await axios(method);
+      //
+      return Response.get(200, 'Success', attendance);
+    } catch (err) {
+      return Response.get(500, err.message, []);
+    }
+  }
 
   @ApiBearerAuth('JWT-auth')
   @Get()
@@ -120,6 +160,24 @@ export class AttendacneController {
   }
 
   @ApiBearerAuth('JWT-auth')
+  @Post('app')
+  async getAttendanceApp(
+    @Body() getAttendanceDto: GetAttendanceDto,
+    @Req() request,
+  ) {
+    try {
+      const employeeNumber = request.user_information.refrence_number;
+      const response = await this.attendacneService.getAttendanceByMonth(
+        getAttendanceDto,
+        employeeNumber,
+      );
+      return Response.get(200, 'Success', response);
+    } catch (err) {
+      return Response.get(500, err.message, []);
+    }
+  }
+
+  @ApiBearerAuth('JWT-auth')
   @Post()
   async getAttendance(
     @Body() getAttendanceDto: GetAttendanceDto,
@@ -141,6 +199,18 @@ export class AttendacneController {
     );
   }
 
+  @Post('getattendancedata/app')
+  async functionApp(@Body() getAttendanceDataDto: GetAttendanceDataDto) {
+    try {
+      const data = await this.attendacneService.getAttendanceDataDto(
+        getAttendanceDataDto,
+      );
+      return Response.get(200, 'Success', data);
+    } catch (err) {
+      return Response.get(500, err.message, []);
+    }
+  }
+
   @Post('getattendancedata')
   async function(@Body() getAttendanceDataDto: GetAttendanceDataDto) {
     return await this.attendacneService.getAttendanceDataDto(
@@ -154,74 +224,75 @@ export class AttendacneController {
     hrAttendance: { date: string; time: string; type: string; comment: string },
     @Req() request,
   ) {
-    const employeeNumber = request.user_information.refrence_number;
-    const employee = await this.employeeService.findByShift(employeeNumber);
-    var time_to_send = this.attendacneService
-      .timeHandler(hrAttendance.time)
-      .replace(':', '');
+    try {
+      const employeeNumber = request.user_information.refrence_number;
+      const employee = await this.employeeService.findByShift(employeeNumber);
+      var time_to_send = this.attendacneService
+        .timeHandler(hrAttendance.time)
+        .replace(':', '');
 
-    //
-    var attendance_status: string = hrAttendance.type
-      .toLowerCase()
-      .includes('in')
-      ? 'I'
-      : 'O';
-    //
-    var time_to_check: string = hrAttendance.time;
-    let newTime: string[] = time_to_check.split('');
-    newTime.splice(2, 0, ':');
-    time_to_check = newTime.join('');
-    var attendance_type: string =
-      employee.shift.start_time.toString() <
-      this.attendacneService.timeHandler(hrAttendance.time)
-        ? 'L'
-        : 'P';
-    const data = new FormData();
-    if (time_to_send.length == 3) {
-      time_to_send = `0${time_to_send}`;
-    }
+      //
+      var attendance_status: string = hrAttendance.type
+        .toLowerCase()
+        .includes('in')
+        ? 'I'
+        : 'O';
+      //
+      var time_to_check: string = hrAttendance.time;
+      let newTime: string[] = time_to_check.split('');
+      newTime.splice(2, 0, ':');
+      time_to_check = newTime.join('');
+      var attendance_type: string =
+        employee.shift.start_time.toString() <
+        this.attendacneService.timeHandler(hrAttendance.time)
+          ? 'L'
+          : 'P';
+      const data = new FormData();
+      if (time_to_send.length == 3) {
+        time_to_send = `0${time_to_send}`;
+      }
 
-    data.append(
-      'data',
-      JSON.stringify({
-        empid: employeeNumber,
-        date: hrAttendance.date,
-        time: time_to_send,
-        status: attendance_type,
-        comment: hrAttendance.comment,
-        attype: attendance_status,
-      }),
-    );
+      data.append(
+        'data',
+        JSON.stringify({
+          empid: employeeNumber,
+          date: hrAttendance.date,
+          time: time_to_send,
+          status: attendance_type,
+          comment: hrAttendance.comment,
+          attype: attendance_status,
+        }),
+      );
 
-    var config = {
-      method: 'post',
-      url: 'http://benefitx.blue-ex.com/hrm/cronjob/appattendance_update.php',
-      headers: {
-        ...data.getHeaders(),
-      },
-      data: data,
-    };
-    const respones = await axios(config);
+      var config = {
+        method: 'post',
+        url: 'http://benefitx.blue-ex.com/hrm/cronjob/appattendance_update.php',
+        headers: {
+          ...data.getHeaders(),
+        },
+        data: data,
+      };
+      const respones = await axios(config);
 
-    let testAccount = await nodemailer.createTestAccount();
+      let testAccount = await nodemailer.createTestAccount();
 
-    let transporter = nodemailer.createTransport({
-      host: 'orio.tech',
-      port: 465,
-      secure: true, // true for 465, false for other ports
-      auth: {
-        user: `attendance@orio.tech`, // generated ethereal user
-        pass: `kkcdY?umlCP`, // generated ethereal password
-      },
-    });
-    //
-    let info = await transporter.sendMail({
-      from: '"ORIO - Technologies" <attendance@orio.tech>', // sender address
-      // to: 'anam.saleem@blue-ex.com,hr.south@blue-ex.com', // list of receivers
-      to: 'ateebkhan997@gmail.com', // list of receivers/
-      subject: 'Attendance Request!', // Subject line
-      // text: 'Hello world?', // plain text body
-      html: `
+      let transporter = nodemailer.createTransport({
+        host: 'orio.tech',
+        port: 465,
+        secure: true, // true for 465, false for other ports
+        auth: {
+          user: `attendance@orio.tech`, // generated ethereal user
+          pass: `kkcdY?umlCP`, // generated ethereal password
+        },
+      });
+      //
+      let info = await transporter.sendMail({
+        from: '"ORIO - Technologies" <attendance@orio.tech>', // sender address
+        // to: 'anam.saleem@blue-ex.com,hr.south@blue-ex.com', // list of receivers
+        to: 'ateebkhan997@gmail.com', // list of receivers/
+        subject: 'Attendance Request!', // Subject line
+        // text: 'Hello world?', // plain text body
+        html: `
       <p>
       Hi,</br>
       Me ${employee.employee_name} with Employee ID: ${employeeNumber}, request you to kindly update my attendance for - Date ${hrAttendance.date}, ${hrAttendance.time}, ${hrAttendance.type}.
@@ -231,11 +302,13 @@ export class AttendacneController {
       ${hrAttendance.comment}
       </p>
       `,
-    });
+      });
 
-    return {
-      message: 'request success!',
-    };
+      return Response.get(200, 'Success', []);
+    } catch (err) {
+      return Response.get(500, err.message, []);
+    }
   }
 }
+
 //
