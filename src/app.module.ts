@@ -42,6 +42,10 @@ export class AppModule implements NestModule {
       .apply(TokenMiddleware)
       .exclude(
         {
+          path: '/attendance-app/attendance/getattendancedata/app',
+          method: RequestMethod.ALL,
+        },
+        {
           path: '/attendance-app/attendance/server',
           method: RequestMethod.ALL,
         },
