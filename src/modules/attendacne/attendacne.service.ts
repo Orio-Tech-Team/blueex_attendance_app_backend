@@ -172,7 +172,7 @@ export class AttendacneService {
       return await getManager().query(query);
     } else {
       query +=
-        " WHERE employees.employee_number ='" +
+        " WHERE t.employee_number ='" +
         getAttendanceDataDto.employee_number +
         "'";
       return await getManager().query(query);
