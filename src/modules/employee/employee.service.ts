@@ -1,23 +1,30 @@
 import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
+import { InjectConnection, InjectRepository } from '@nestjs/typeorm';
 import { DataNotFoundException } from 'src/Helper/Exception/data-not-found.exception';
-import { Repository } from 'typeorm';
+import { Connection, Repository } from 'typeorm';
 import { Employee } from './entities/employee.entity';
 
 @Injectable()
 export class EmployeeService {
   constructor(
+    @InjectConnection()
+    private readonly connection: Connection,
     @InjectRepository(Employee)
     private readonly employeeRepository: Repository<Employee>,
   ) {}
 
   async findByEmployee(employeeNumber: number) {
-    return await this.employeeRepository.find({
-      where: {
-        employee_number: employeeNumber,
-      },
-      relations: ['employee_station', 'employee_station.station'],
-    });
+    return await this.connection
+      .query(`SELECT e.employee_number, e.employee_name, s.*
+    FROM employees e
+    JOIN employee_stations es ON e.employee_number = es.employee_number
+    JOIN stations s ON es.station_code = s.station_code WHERE e.employee_number='${employeeNumber}' ORDER BY s.id DESC;`);
+    // return await this.employeeRepository.find({
+    //   where: {
+    //     employee_number: employeeNumber,
+    //   },
+    //   relations: ['employee_station', 'employee_station.station'],
+    // });
   }
 
   async findByShift(employeeNumber: number): Promise<Employee> {
