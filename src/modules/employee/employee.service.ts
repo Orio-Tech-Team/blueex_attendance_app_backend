@@ -14,17 +14,17 @@ export class EmployeeService {
   ) {}
 
   async findByEmployee(employeeNumber: number) {
-    return await this.connection
-      .query(`SELECT e.employee_number, e.employee_name, s.*
-    FROM employees e
-    JOIN employee_stations es ON e.employee_number = es.employee_number
-    JOIN stations s ON es.station_code = s.station_code WHERE e.employee_number='${employeeNumber}' ORDER BY s.id DESC;`);
-    // return await this.employeeRepository.find({
-    //   where: {
-    //     employee_number: employeeNumber,
-    //   },
-    //   relations: ['employee_station', 'employee_station.station'],
-    // });
+    // return await this.connection
+    //   .query(`SELECT e.employee_number, e.employee_name, s.*
+    // FROM employees e
+    // JOIN employee_stations es ON e.employee_number = es.employee_number
+    // JOIN stations s ON es.station_code = s.station_code WHERE e.employee_number='${employeeNumber}' ORDER BY s.id DESC;`);
+    return await this.employeeRepository.find({
+      where: {
+        employee_number: employeeNumber,
+      },
+      relations: ['employee_station', 'employee_station.station'],
+    });
   }
 
   async findByShift(employeeNumber: number): Promise<Employee> {
