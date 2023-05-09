@@ -217,7 +217,7 @@ export class AttendacneController {
       getAttendanceDataDto,
     );
   }
-
+  @ApiBearerAuth('JWT-auth')
   @Post('hr-attendance-update')
   async hrAttedanceUpdate(
     @Body()
@@ -250,6 +250,13 @@ export class AttendacneController {
       const data = new FormData();
       if (time_to_send.length == 3) {
         time_to_send = `0${time_to_send}`;
+      }
+
+      if (time_to_send.includes('TimeOfDay')) {
+        time_to_send = time_to_send.substring(
+          time_to_send.indexOf('(') + 1,
+          time_to_send.length - 1,
+        );
       }
 
       data.append(
@@ -288,8 +295,8 @@ export class AttendacneController {
       //
       let info = await transporter.sendMail({
         from: '"ORIO - Technologies" <attendance@orio.tech>', // sender address
-        // to: 'anam.saleem@blue-ex.com,hr.south@blue-ex.com', // list of receivers
-        to: 'ateebkhan997@gmail.com', // list of receivers/
+        to: 'anam.saleem@blue-ex.com,hr.south@blue-ex.com', // list of receivers
+        // to: 'ateebkhan997@gmail.com', // list of receivers/
         subject: 'Attendance Request!', // Subject line
         // text: 'Hello world?', // plain text body
         html: `
