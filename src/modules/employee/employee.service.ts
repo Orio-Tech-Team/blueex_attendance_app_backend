@@ -39,7 +39,11 @@ export class EmployeeService {
         throw DataNotFoundException.exception('Invalid Employee');
       });
   }
-
+  async findByEmployeeNumber(id: string): Promise<Employee> {
+    return this.employeeRepository.findOne({
+      where: { employee_number: id },
+    });
+  }
   async find(): Promise<Employee[]> {
     return this.employeeRepository.find({
       where: {

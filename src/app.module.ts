@@ -17,6 +17,7 @@ import { NotificationService } from './modules/notification/notification.service
 import { ShiftModule } from './modules/shift/shift.module';
 import { DepartmentsModule } from './modules/departments/departments.module';
 import { DesignationModule } from './modules/designation/designation.module';
+import { ScheduleModule } from './cronJob/scheduledTask.module';
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { DesignationModule } from './modules/designation/designation.module';
     ShiftModule,
     DepartmentsModule,
     DesignationModule,
+    ScheduleModule,
   ],
   controllers: [],
   providers: [],

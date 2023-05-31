@@ -7,7 +7,6 @@ import { Employee } from './entities/employee.entity';
 @Controller('employee')
 export class EmployeeController {
   constructor(private readonly employeeService: EmployeeService) {}
-
   @ApiBearerAuth('JWT-auth')
   @Get('app')
   async findByEmployeeApp(@Req() req): Promise<any> {
