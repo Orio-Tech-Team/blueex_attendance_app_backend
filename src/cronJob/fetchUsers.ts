@@ -4,7 +4,7 @@ const axios = require('axios');
 const https = require('https');
 //
 interface ReturnType {
-  emp_id: string;
+  emp_id: number;
   emp_name: string;
   emp_cnic: string;
   emp_date_joining: string;
@@ -13,7 +13,7 @@ interface ReturnType {
   email: string;
   contact: string;
   location: string;
-  shift: string;
+  shift: number;
   desgno: string;
   status: 'YES' | 'NO';
 }
