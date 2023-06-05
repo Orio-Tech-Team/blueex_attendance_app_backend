@@ -11,7 +11,7 @@ export class Shift extends GenericEntity {
   @Column('time', { nullable: false })
   end_time: Date;
 
-  @Column({ nullable: false, length: 1 })
+  @Column({ nullable: false, length: 2 })
   type: string;
 
   @Column()
