@@ -3,7 +3,7 @@ import { fetchUser } from './fetchUsers';
 import { Controller } from '@nestjs/common';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const cron = require('node-cron');
-const schedule = '0 */1 * * * *';
+const schedule = '0 0 */1 * * *';
 //
 @Controller('')
 export class ScheduledTask {
