@@ -165,16 +165,16 @@ export class AttendacneService {
 
   async getAttendanceDataDto(getAttendanceDataDto: GetAttendanceDataDto) {
     // let query = `SELECT att.*,ep.employee_name,ep.shift_id,s.start_time, s.end_time,CONCAT(s.start_time," - ",s.end_time) AS shift, (att.outtime-att.intime) as working_hours FROM attendance att left join employees ep on ep.employee_number=att.employee_number left join shifts s on s.id=ep.shift_id WHERE att.attendance_date BETWEEN '${getAttendanceDataDto.from_date}' AND '${getAttendanceDataDto.to_date}';`;
-
-    let query = `SELECT '${getAttendanceDataDto.from_date}' as attendance_date,employee_number,employee_name,shift_id,IF(attend_type = 'Absent','00:00:00',start_time) AS intime,IF(attend_type = 'Absent','00:00:00',end_time) AS outtime,shift,working_hours,attend_type as type FROM (SELECT employee_number,employee_name,shift_id,(SELECT intime FROM attendance WHERE attendance.employee_number = employees.employee_number AND attendance_date = '${getAttendanceDataDto.from_date}') AS start_time, (SELECT outtime FROM attendance WHERE attendance.employee_number = employees.employee_number AND attendance_date = '${getAttendanceDataDto.from_date}') AS end_time,CONCAT(start_time," - ",end_time) AS shift,IFNULL((SELECT (TIMEDIFF(outtime,intime)) FROM attendance WHERE attendance.employee_number = employees.employee_number AND attendance_date = '${getAttendanceDataDto.from_date}'),0)  AS working_hours,IFNULL((SELECT type FROM attendance WHERE attendance.employee_number = employees.employee_number AND attendance_date = '${getAttendanceDataDto.from_date}'),'Absent')  AS attend_type from employees LEFT JOIN shifts on employees.shift_id = shifts.id order by employee_number) t`;
+    let query = `SELECT e.id,e.shift_id,e.employee_number,e.employee_name,IFNULL(a.intime,0) as intime,IFNULL(a.outtime,0) as outtime,IFNULL(a.type,'Absent') as type,DATE_FORMAT(a.attendance_date, '%Y-%m-%d') as attendance_date, DATE_FORMAT(a.attendance_date, '%a') as day, IFNULL(TIMEDIFF(outtime,intime),0) as working_hours, CONCAT(s.start_time,' - ',s.end_time) as shift from employees e left JOIN attendance a on a.employee_number=e.employee_number  left JOIN shifts s on s.id=e.shift_id WHERE e.employee_number = '${getAttendanceDataDto.employee_number}'  and a.attendance_date BETWEEN '${getAttendanceDataDto.from_date}' AND '${getAttendanceDataDto.to_date}'`;
+    // let query = `SELECT '${getAttendanceDataDto.from_date}' as attendance_date,employee_number,employee_name,shift_id,IF(attend_type = 'Absent','00:00:00',start_time) AS intime,IF(attend_type = 'Absent','00:00:00',end_time) AS outtime,shift,working_hours,attend_type as type FROM (SELECT employee_number,employee_name,shift_id,(SELECT intime FROM attendance WHERE attendance.employee_number = employees.employee_number AND attendance_date = '${getAttendanceDataDto.from_date}') AS start_time, (SELECT outtime FROM attendance WHERE attendance.employee_number = employees.employee_number AND attendance_date = '${getAttendanceDataDto.from_date}') AS end_time,CONCAT(start_time," - ",end_time) AS shift,IFNULL((SELECT (TIMEDIFF(outtime,intime)) FROM attendance WHERE attendance.employee_number = employees.employee_number AND attendance_date = '${getAttendanceDataDto.from_date}'),0)  AS working_hours,IFNULL((SELECT type FROM attendance WHERE attendance.employee_number = employees.employee_number AND attendance_date = '${getAttendanceDataDto.from_date}'),'Absent')  AS attend_type from employees LEFT JOIN shifts on employees.shift_id = shifts.id order by employee_number) t`;
 
     if (!getAttendanceDataDto.employee_number) {
       return await getManager().query(query);
     } else {
-      query +=
-        " WHERE t.employee_number ='" +
-        getAttendanceDataDto.employee_number +
-        "'";
+      // query +=
+      //   " WHERE t.employee_number ='" +
+      //   getAttendanceDataDto.employee_number +
+      //   "'";
       return await getManager().query(query);
     }
   }
